@@ -21,6 +21,9 @@
 #include "MPU9250.h"
 
 #include <cmath>
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <esp_log.h>
 
 namespace YOBA {
