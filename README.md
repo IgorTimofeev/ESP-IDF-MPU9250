@@ -1,2 +1,3 @@
 # ESP-IDF-MPU9250
-Modified version of wollewald's work on MPU9250 IMU
+
+Based on nice Arduino library https://github.com/wollewald/MPU9250_WE and adapted for ESP-IDF
