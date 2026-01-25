@@ -172,42 +172,30 @@ namespace YOBA {
 		writeMPU9250Register(REGISTER_PWR_MGMT_2, regVal);
 	}
 
-	Vector3F MPU9250::getAccelData(const uint8_t* buffer) const {
-		const auto x = static_cast<int16_t>((buffer[0] << 8) | buffer[1]);
-		const auto y = static_cast<int16_t>((buffer[2] << 8) | buffer[3]);
-		const auto z = static_cast<int16_t>((buffer[4] << 8) | buffer[5]);
-
-		return Vector3F {
-			static_cast<float>(x) * accelScaleFactor,
-			static_cast<float>(y) * accelScaleFactor,
-			static_cast<float>(z) * accelScaleFactor
-		};
+	void MPU9250::getAccelData(const uint8_t* buffer, float& x, float& y, float& z) const {
+		x = static_cast<float>(static_cast<int16_t>((buffer[0] << 8) | buffer[1])) * accelScaleFactor;
+		y = static_cast<float>(static_cast<int16_t>((buffer[2] << 8) | buffer[3])) * accelScaleFactor;
+		z = static_cast<float>(static_cast<int16_t>((buffer[4] << 8) | buffer[5])) * accelScaleFactor;
 	}
 
-	Vector3F MPU9250::getAccelData() const {
+	void MPU9250::getAccelData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
 		_bus->read(REGISTER_ACCEL_OUT | 0x80, buffer, 6);
 
-		return getAccelData(buffer);
+		return getAccelData(buffer, x, y, z);
 	}
 
-	Vector3F MPU9250::getGyroData(const uint8_t* buffer) const {
-		const auto x = static_cast<int16_t>((buffer[0] << 8) | buffer[1]);
-		const auto y = static_cast<int16_t>((buffer[2] << 8) | buffer[3]);
-		const auto z = static_cast<int16_t>((buffer[4] << 8) | buffer[5]);
-
-		return {
-			static_cast<float>(x) * gyroScaleFactor,
-			static_cast<float>(y) * gyroScaleFactor,
-			static_cast<float>(z) * gyroScaleFactor
-		};
+	void MPU9250::getGyroData(const uint8_t* buffer, float& x, float& y, float& z) const {
+		x = static_cast<float>(static_cast<int16_t>((buffer[0] << 8) | buffer[1])) * gyroScaleFactor;
+		y = static_cast<float>(static_cast<int16_t>((buffer[2] << 8) | buffer[3])) * gyroScaleFactor;
+		z = static_cast<float>(static_cast<int16_t>((buffer[4] << 8) | buffer[5])) * gyroScaleFactor;
 	}
 
-	Vector3F MPU9250::getGyroData() const {
+	void MPU9250::getGyroData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
 		_bus->read(REGISTER_GYRO_OUT | 0x80, buffer, 6);
 
-		return getGyroData(buffer);
+		return getGyroData(buffer, x, y, z);
 	}
 
 	float MPU9250::getTemperature() const {
@@ -481,23 +469,17 @@ namespace YOBA {
 		delayMs(100);
 	}
 
-	Vector3F MPU9250::getMagData(const uint8_t* buffer) const {
-		const auto x = static_cast<int16_t>((buffer[1] << 8) | buffer[0]);
-		const auto y = static_cast<int16_t>((buffer[3] << 8) | buffer[2]);
-		const auto z = static_cast<int16_t>((buffer[5] << 8) | buffer[4]);
-
-		return {
-			x * magScaleFactor * magASAFactor.getX(),
-			y * magScaleFactor * magASAFactor.getY(),
-			z * magScaleFactor * magASAFactor.getZ()
-		};
+	void MPU9250::getMagData(const uint8_t* buffer, float& x, float& y, float& z) const {
+		x = static_cast<float>(static_cast<int16_t>((buffer[1] << 8) | buffer[0])) * magScaleFactor * magASAFactorX;
+		y = static_cast<float>(static_cast<int16_t>((buffer[3] << 8) | buffer[2])) * magScaleFactor * magASAFactorY;
+		z = static_cast<float>(static_cast<int16_t>((buffer[5] << 8) | buffer[4])) * magScaleFactor * magASAFactorZ;
 	}
 
-	Vector3F MPU9250::getMagData() const {
+	void MPU9250::getMagData(float& x, float& y, float& z) const {
 		uint8_t rawData[6];
 		readAK8963Data(rawData);
 
-		return getMagData(rawData);
+		return getMagData(rawData, x, y, z);
 	}
 
 	void MPU9250::getFIFOData(uint8_t* buffer, const uint16_t count) const {
@@ -506,12 +488,15 @@ namespace YOBA {
 
 	void MPU9250::raedAK8963ASAVals() {
 		uint8_t rawCorr = 0;
+
 		rawCorr = readAK8963Register8(REGISTER_AK8963_ASAX);
-		magASAFactor.setX((0.5 * (rawCorr - 128) / 128.0) + 1.0);
+		magASAFactorX = (0.5 * (rawCorr - 128) / 128.0f) + 1.0f;
+
 		rawCorr = readAK8963Register8(REGISTER_AK8963_ASAY);
-		magASAFactor.setY((0.5 * (rawCorr - 128) / 128.0) + 1.0);
+		magASAFactorY = (0.5 * (rawCorr - 128) / 128.0f) + 1.0f;
+
 		rawCorr = readAK8963Register8(REGISTER_AK8963_ASAZ);
-		magASAFactor.setZ((0.5 * (rawCorr - 128) / 128.0) + 1.0);
+		magASAFactorZ = (0.5 * (rawCorr - 128) / 128.0f) + 1.0f;
 
 //		ESP_LOGI(_logTag, "ASA vals: %f, %f, %f", magASAFactor.getX(), magASAFactor.getY(), magASAFactor.getZ());
 	}

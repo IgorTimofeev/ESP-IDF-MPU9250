@@ -8,7 +8,7 @@ if(ESP_PLATFORM)
     idf_component_register(
         SRCS ${YOBA_SOURCES}
         INCLUDE_DIRS src
-        REQUIRES ESP-IDF-BusHAL ESP-IDF-Vector3
+        REQUIRES ESP-IDF-BusHAL
     )
 
     return()

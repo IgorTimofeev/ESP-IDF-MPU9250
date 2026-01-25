@@ -22,7 +22,6 @@
 
 #include <cstdint>
 
-#include <vector3.h>
 #include <busHAL.h>
 
 namespace YOBA {
@@ -192,11 +191,11 @@ namespace YOBA {
 
 			/* x,y,z results */
 
-			Vector3F getAccelData(const uint8_t* buffer) const;
-			Vector3F getAccelData() const;
+			void getAccelData(const uint8_t* buffer, float& x, float& y, float& z) const;
+			void getAccelData(float& x, float& y, float& z) const;
 
-			Vector3F getGyroData(const uint8_t* buffer) const;
-			Vector3F getGyroData() const;
+			void getGyroData(const uint8_t* buffer, float& x, float& y, float& z) const;
+			void getGyroData(float& x, float& y, float& z) const;
 
 			float getTemperature() const;
 
@@ -253,8 +252,8 @@ namespace YOBA {
 
 			void setFIFOMode(MPU9250_fifoMode mode) const;
 
-			Vector3F getMagData(const uint8_t* buffer) const;
-			Vector3F getMagData() const;
+			void getMagData(const uint8_t* buffer, float& x, float& y, float& z) const;
+			void getMagData(float& x, float& y, float& z) const;
 
 			uint8_t readWhoAmIMag();
 
@@ -354,7 +353,9 @@ namespace YOBA {
 			float gyroScaleFactor = 1;
 
 			constexpr static float magScaleFactor = 4912.0f / 32760.0f;
-			Vector3F magASAFactor { 1, 1, 1 };
+			float magASAFactorX = 1;
+			float magASAFactorY = 1;
+			float magASAFactorZ = 1;
 
 			busHAL* _bus = nullptr;
 
