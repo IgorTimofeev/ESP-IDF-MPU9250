@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 if(ESP_PLATFORM)
     file(GLOB_RECURSE YOBA_SOURCES
-        "src/*.*"
+        "src/MPU9250.cpp"
     )
 
     idf_component_register(
