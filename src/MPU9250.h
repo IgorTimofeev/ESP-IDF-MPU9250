@@ -123,7 +123,7 @@ namespace YOBA {
 
 	class MPU9250 {
 		public:
-			bool setup(busHAL* bus);
+			bool setup(BusHAL* bus);
 
 			uint8_t getWhoAmI() const;
 
@@ -357,7 +357,7 @@ namespace YOBA {
 			float magASAFactorY = 1;
 			float magASAFactorZ = 1;
 
-			busHAL* _bus = nullptr;
+			BusHAL* _bus = nullptr;
 
 			static void delayMs(uint32_t ms);
 			void resetMPU9250();

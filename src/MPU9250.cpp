@@ -27,7 +27,7 @@
 #include <esp_log.h>
 
 namespace YOBA {
-	bool MPU9250::setup(busHAL* bus) {
+	bool MPU9250::setup(BusHAL* bus) {
 		_bus = bus;
 
 		resetMPU9250();
