@@ -180,7 +180,7 @@ namespace YOBA {
 
 	void MPU9250::getAccelData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
-		_bus->read(REGISTER_ACCEL_OUT | 0x80, buffer, 6);
+		_bus->read(REGISTER_ACCEL_OUT | 0x80, { buffer, 6 });
 
 		return getAccelData(buffer, x, y, z);
 	}
@@ -193,7 +193,7 @@ namespace YOBA {
 
 	void MPU9250::getGyroData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
-		_bus->read(REGISTER_GYRO_OUT | 0x80, buffer, 6);
+		_bus->read(REGISTER_GYRO_OUT | 0x80, { buffer, 6 });
 
 		return getGyroData(buffer, x, y, z);
 	}
@@ -483,7 +483,7 @@ namespace YOBA {
 	}
 
 	void MPU9250::getFIFOData(uint8_t* buffer, const uint16_t count) const {
-		_bus->read(REGISTER_FIFO_R_W | 0x80, buffer, count);
+		_bus->read(REGISTER_FIFO_R_W | 0x80, { buffer, count });
 	}
 
 	void MPU9250::raedAK8963ASAVals() {
@@ -516,7 +516,7 @@ namespace YOBA {
 	}
 
 	void MPU9250::readAK8963Data(uint8_t* buf) const {
-		_bus->read(REGISTER_EXT_SLV_SENS_DATA_00 | 0x80, buf, 6);
+		_bus->read(REGISTER_EXT_SLV_SENS_DATA_00 | 0x80, { buf, 6 });
 
 //	if(!useSPI){
 //		_wire->beginTransmission(i2cAddress);
