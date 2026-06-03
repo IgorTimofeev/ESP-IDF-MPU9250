@@ -193,12 +193,12 @@ namespace YOBA {
 			/* x,y,z results */
 
 			void getAccelData(const uint8_t* buffer, float& x, float& y, float& z) const;
-			void getAccelData(float& x, float& y, float& z) const;
+			void readAccelData(float& x, float& y, float& z) const;
 
 			void getGyroData(const uint8_t* buffer, float& x, float& y, float& z) const;
-			void getGyroData(float& x, float& y, float& z) const;
+			void readGyroData(float& x, float& y, float& z) const;
 
-			float getTemperature() const;
+			float readTemperature() const;
 
 			/* Power, Sleep, Standby */
 
@@ -249,16 +249,16 @@ namespace YOBA {
 			void resetFIFO() const;
 
 			uint16_t getFIFOCount() const;
-			void getFIFOData(uint8_t* buffer, uint16_t count) const;
+			void readFIFOData(uint8_t* buffer, uint16_t count) const;
 
 			void setFIFOMode(MPU9250_fifoMode mode) const;
 
 			void getMagData(const uint8_t* buffer, float& x, float& y, float& z) const;
-			void getMagData(float& x, float& y, float& z) const;
+			void readMagData(float& x, float& y, float& z) const;
 
-			uint8_t readWhoAmIMag();
+			uint8_t readWhoAmIMag() const;
 
-			void setMagOpMode(AK8963_opMode opMode);
+			void setMagOpMode(AK8963_opMode opMode) const;
 
 		private:
 			constexpr static auto _logTag = "MPU-9250";
@@ -361,25 +361,25 @@ namespace YOBA {
 			BusHAL* _bus = nullptr;
 
 			static void delayMs(uint32_t ms);
-			void resetMPU9250();
+			void resetMPU9250() const;
 
 			bool setupMagnetometer();
 
-			void raedAK8963ASAVals();
-			void enableI2CMaster();
+			void readAK8963ASAVals();
+			void enableI2CMaster() const;
 			void writeMPU9250Register(uint8_t reg, uint8_t val) const;
 
 			uint8_t readMPU9250Register8(uint8_t reg) const;
 
-			void enableAK8963DataRead(uint8_t reg, uint8_t bytes);
+			void enableAK8963DataRead(uint8_t reg, uint8_t bytes) const;
 
-			void resetAK8963();
+			void resetAK8963() const;
 
 			void writeAK8963Register(uint8_t reg, uint8_t val) const;
-			uint8_t readAK8963Register8(uint8_t reg);
+			uint8_t readAK8963Register8(uint8_t reg) const;
 
 			void readAK8963Data(uint8_t* buf) const;
-			void setAK896316Bit();
-			uint8_t readAK8963Status2Register();
+			void setAK896316Bit() const;
+			uint8_t readAK8963Status2Register() const;
 	};
 }

@@ -178,7 +178,7 @@ namespace YOBA {
 		z = static_cast<float>(static_cast<int16_t>((buffer[4] << 8) | buffer[5])) * accelScaleFactor;
 	}
 
-	void MPU9250::getAccelData(float& x, float& y, float& z) const {
+	void MPU9250::readAccelData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
 		_bus->read(REGISTER_ACCEL_OUT | 0x80, { buffer, 6 });
 
@@ -191,14 +191,14 @@ namespace YOBA {
 		z = static_cast<float>(static_cast<int16_t>((buffer[4] << 8) | buffer[5])) * gyroScaleFactor;
 	}
 
-	void MPU9250::getGyroData(float& x, float& y, float& z) const {
+	void MPU9250::readGyroData(float& x, float& y, float& z) const {
 		uint8_t buffer[6];
 		_bus->read(REGISTER_GYRO_OUT | 0x80, { buffer, 6 });
 
 		return getGyroData(buffer, x, y, z);
 	}
 
-	float MPU9250::getTemperature() const {
+	float MPU9250::readTemperature() const {
 		int16_t value = 0;
 		_bus->readInt16BE(REGISTER_TEMP_OUT | 0x80, value);
 
@@ -350,12 +350,12 @@ namespace YOBA {
 		writeMPU9250Register(REGISTER_CONFIG, regVal);
 	}
 
-	void MPU9250::resetMPU9250() {
+	void MPU9250::resetMPU9250() const {
 		writeMPU9250Register(REGISTER_PWR_MGMT_1, REGISTER_VALUE_RESET);
 		delayMs(10);  // wait for registers to reset
 	}
 
-	void MPU9250::enableI2CMaster() {
+	void MPU9250::enableI2CMaster() const {
 		uint8_t regVal = readMPU9250Register8(REGISTER_USER_CTRL);
 		regVal |= REGISTER_VALUE_I2C_MST_EN;
 
@@ -424,7 +424,7 @@ namespace YOBA {
 
 		setMagOpMode(AK8963_FUSE_ROM_ACC_MODE);
 		delayMs(10);
-		raedAK8963ASAVals();
+		readAK8963ASAVals();
 		delayMs(10);
 		setAK896316Bit();
 		delayMs(10);
@@ -438,11 +438,11 @@ namespace YOBA {
 
 	}
 
-	uint8_t MPU9250::readWhoAmIMag() {
+	uint8_t MPU9250::readWhoAmIMag() const {
 		return readAK8963Register8(REGISTER_AK8963_WIA);
 	}
 
-	void MPU9250::setMagOpMode(const AK8963_opMode opMode) {
+	void MPU9250::setMagOpMode(const AK8963_opMode opMode) const {
 		uint8_t regVal = readAK8963Register8(REGISTER_AK8963_CNTL_1);
 		regVal &= 0xF0;
 		regVal |= opMode;
@@ -457,14 +457,14 @@ namespace YOBA {
      Private Functions
 *************************************************/
 
-	void MPU9250::enableAK8963DataRead(const uint8_t reg, const uint8_t bytes) {
+	void MPU9250::enableAK8963DataRead(const uint8_t reg, const uint8_t bytes) const {
 		writeMPU9250Register(REGISTER_I2C_SLV0_ADDR, MAGNETOMETER_I2C_ADDRESS | REGISTER_VALUE_AK8963_READ); // read AK8963
 		writeMPU9250Register(REGISTER_I2C_SLV0_REG, reg); // define AK8963 register to be read
 		writeMPU9250Register(REGISTER_I2C_SLV0_CTRL, 0b1000'0000 | bytes); // Enable read | number of byte
 		delayMs(10);
 	}
 
-	void MPU9250::resetAK8963() {
+	void MPU9250::resetAK8963() const {
 		writeAK8963Register(REGISTER_AK8963_CNTL_2, 0x01);
 		delayMs(100);
 	}
@@ -475,18 +475,18 @@ namespace YOBA {
 		z = static_cast<float>(static_cast<int16_t>((buffer[5] << 8) | buffer[4])) * magScaleFactor * magASAFactorZ;
 	}
 
-	void MPU9250::getMagData(float& x, float& y, float& z) const {
+	void MPU9250::readMagData(float& x, float& y, float& z) const {
 		uint8_t rawData[6];
 		readAK8963Data(rawData);
 
 		return getMagData(rawData, x, y, z);
 	}
 
-	void MPU9250::getFIFOData(uint8_t* buffer, const uint16_t count) const {
+	void MPU9250::readFIFOData(uint8_t* buffer, const uint16_t count) const {
 		_bus->read(REGISTER_FIFO_R_W | 0x80, { buffer, count });
 	}
 
-	void MPU9250::raedAK8963ASAVals() {
+	void MPU9250::readAK8963ASAVals() {
 		uint8_t rawCorr = 0;
 
 		rawCorr = readAK8963Register8(REGISTER_AK8963_ASAX);
@@ -507,7 +507,7 @@ namespace YOBA {
 		writeMPU9250Register(REGISTER_I2C_SLV0_DO, val);
 	}
 
-	uint8_t MPU9250::readAK8963Register8(const uint8_t reg) {
+	uint8_t MPU9250::readAK8963Register8(const uint8_t reg) const {
 		enableAK8963DataRead(reg, 0x01);
 		uint8_t const regVal = readMPU9250Register8(REGISTER_EXT_SLV_SENS_DATA_00);
 		enableAK8963DataRead(REGISTER_AK8963_HXL, 0x08);
@@ -517,38 +517,15 @@ namespace YOBA {
 
 	void MPU9250::readAK8963Data(uint8_t* buf) const {
 		_bus->read(REGISTER_EXT_SLV_SENS_DATA_00 | 0x80, { buf, 6 });
-
-//	if(!useSPI){
-//		_wire->beginTransmission(i2cAddress);
-//		_wire->write(MPU9250::REGISTER_EXT_SLV_SENS_DATA_00);
-//		_wire->endTransmission(false);
-//		_wire->requestFrom(i2cAddress,(uint8_t)6);
-//		if(_wire->available()){
-//			for(int i=0; i<6; i++){
-//				buf[i] = _wire->read();
-//			}
-//		}
-//	}
-//	else{
-//		uint8_t reg = MPU9250::REGISTER_EXT_SLV_SENS_DATA_00 | 0x80;
-//		_spi->beginTransaction(mySPISettings);
-//		digitalWrite(csPin, LOW);
-//		_spi->transfer(reg);
-//		for(int i=0; i<6; i++){
-//			buf[i] = _spi->transfer(0x00);
-//		}
-//		digitalWrite(csPin, HIGH);
-//		_spi->endTransaction();
-//	}
 	}
 
-	void MPU9250::setAK896316Bit() {
+	void MPU9250::setAK896316Bit() const {
 		uint8_t regVal = readAK8963Register8(REGISTER_AK8963_CNTL_1);
 		regVal |= REGISTER_VALUE_AK8963_16_BIT;
 		writeAK8963Register(REGISTER_AK8963_CNTL_1, regVal);
 	}
 
-	uint8_t MPU9250::readAK8963Status2Register() {
+	uint8_t MPU9250::readAK8963Status2Register() const {
 		return readAK8963Register8(REGISTER_AK8963_STATUS_2);
 	}
 
