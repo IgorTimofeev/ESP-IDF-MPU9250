@@ -124,6 +124,9 @@ namespace YOBA {
 
 	class MPU9250 {
 		public:
+			constexpr static uint8_t defaultI2CAddress = 0x68;
+			constexpr static uint32_t defaultI2CFrequencyHz = 400'000;
+
 			bool setup(BusHAL* bus);
 
 			uint8_t getWhoAmI() const;
