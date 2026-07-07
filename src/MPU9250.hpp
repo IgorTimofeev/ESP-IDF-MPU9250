@@ -23,7 +23,7 @@
 #include <cstdint>
 #include <span>
 
-#include <busHAL.h>
+#include <BusHAL.hpp>
 
 namespace YOBA {
 	typedef enum MPU9250_BW_WO_DLPF {
